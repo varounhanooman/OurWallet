@@ -9,6 +9,7 @@ pragma solidity >=0.7.0 <0.9.0;
 contract OurWallet {
 
     uint256 number;
+    address chairPerson;
 
     /**
      * @dev Store value in variable
@@ -17,6 +18,10 @@ contract OurWallet {
     function store(uint256 num) public {
         number = num;
     }
+    
+     function storeChair(address _chairPerson) public {
+        chairPerson = _chairPerson;
+    }
 
     /**
      * @dev Return value 
@@ -24,5 +29,9 @@ contract OurWallet {
      */
     function retrieve() public view returns (uint256){
         return number;
+    }
+    
+    function retrieveChairPerson() public view returns (address){
+        return chairPerson;
     }
 }
