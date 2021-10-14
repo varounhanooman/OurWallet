@@ -14,6 +14,7 @@ contract OurWallet {
 
     uint256 number;
     address public chairPerson;
+    uint256 proposalCount;
     
     mapping(address => bool) public sandboxAddr;
      
@@ -21,9 +22,18 @@ contract OurWallet {
         chairPerson = msg.sender; // 'msg.sender' is sender of current call, contract deployer for a constructor
         emit chairPersonSet(address(0), chairPerson);
         token = IERC20(_token);
+        proposalCount = 0;
     }     
     
     event chairPersonSet(address indexed oldChair, address indexed newChair);
+    
+    struct proposalAddr {
+        address proposedAddr;
+        uint forToggle;
+        uint againstToggle;
+    }
+    
+    proposalAddr[] public proposalArray;
      
     function store(uint256 num) public {
         //place holder for a transaction
@@ -42,11 +52,31 @@ contract OurWallet {
     function disableSanboxAddr(address _sandboxAddr) public {
         sandboxAddr[_sandboxAddr] = false;
     }
+    
+    //propose sandboxAddr
+    function proposeSandboxAddrToggle(address _sandboxAddr) public {
+        proposalArray.push(proposalAddr({
+            proposedAddr: _sandboxAddr,
+            forToggle: 1,
+            againstToggle: 0
+        }));
+    }
+    
+    //tally & execute the vote
+    function tallyExecuteVote(uint256 _proposalIndx) public {
+        if (proposalArray[_proposalIndx].forToggle > proposalArray[_proposalIndx].againstToggle) {
+            sandboxAddr[proposalArray[_proposalIndx].proposedAddr] = !sandboxAddr[proposalArray[_proposalIndx].proposedAddr];
+            proposalCount++;
+        }
+    }
 
-    /**
-     * @dev Return value 
-     * @return value of 'number'
-     */
+
+    function retrieveProposalCount() public view returns (uint256){
+
+        return proposalCount;
+        
+    }
+    
     function retrieve() public view returns (uint256){
         return number;
     }
@@ -63,4 +93,6 @@ contract OurWallet {
     function myBalance() public view returns (uint256){
         return token.balanceOf(msg.sender);
     }
+    
+
 }
