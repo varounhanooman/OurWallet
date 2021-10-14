@@ -10,17 +10,27 @@ contract OurWallet {
 
     uint256 number;
     address chairPerson;
-
-    /**
-     * @dev Store value in variable
-     * @param num value to store
-     */
+    address sanboxAddr;
+     
+    constructor() {
+        chairPerson = msg.sender; // 'msg.sender' is sender of current call, contract deployer for a constructor
+        emit chairPersonSet(address(0), chairPerson);
+    }     
+    
+    event chairPersonSet(address indexed oldChair, address indexed newChair);
+     
     function store(uint256 num) public {
+        //place holder for a transaction
+        require(msg.sender == chairPerson, "Caller is not chair");
         number = num;
     }
     
      function storeChair(address _chairPerson) public {
         chairPerson = _chairPerson;
+    }
+    
+    function storeSanboxAddr(address _sanboxAddr) public {
+        sanboxAddr = _sanboxAddr;
     }
 
     /**
@@ -33,5 +43,9 @@ contract OurWallet {
     
     function retrieveChairPerson() public view returns (address){
         return chairPerson;
+    }
+    
+    function retrieveSanboxAddr() public view returns (address){
+        return sanboxAddr;
     }
 }
