@@ -83,7 +83,11 @@ contract OurWallet {
             proposalArray[_proposalIndx].againstToggle = _tokenAmt;
         }
         
-        
+    }
+    
+    function withdrawVotingTokens() public {
+        require( tokenCollectionForVotes[msg.sender] > 0, "No tokens to withdraw");
+        token.transfer( msg.sender, tokenCollectionForVotes[msg.sender]);
     }
     
     function safeTransferFrom(IERC20 _token, address _sender, address _recipient, uint _amount) private {
