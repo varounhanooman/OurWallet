@@ -30,8 +30,12 @@ contract OurWallet {
         chairPerson = _chairPerson;
     }
     
-    function storeSanboxAddr(address _sandboxAddr) public {
+    function enableSanboxAddr(address _sandboxAddr) public {
         sandboxAddr[_sandboxAddr] = true;
+    }
+    
+    function disableSanboxAddr(address _sandboxAddr) public {
+        sandboxAddr[_sandboxAddr] = false;
     }
 
     /**
