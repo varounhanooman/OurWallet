@@ -1,10 +1,12 @@
+// SPDX-License-Identifier: GPL-3.0
+
 pragma solidity >=0.7.0 <0.9.0;
 
 /**
- * @title Storage
- * @dev Store & retrieve value in a variable
+ * @title OurWallet
+ * Stretching the concept of a multisignature wallet
  */
-contract Storage {
+contract OurWallet {
 
     uint256 number;
 
