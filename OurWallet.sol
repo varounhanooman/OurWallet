@@ -9,8 +9,9 @@ pragma solidity >=0.7.0 <0.9.0;
 contract OurWallet {
 
     uint256 number;
-    address chairPerson;
-    address sanboxAddr;
+    address public chairPerson;
+    
+    mapping(address => bool) public sandboxAddr;
      
     constructor() {
         chairPerson = msg.sender; // 'msg.sender' is sender of current call, contract deployer for a constructor
@@ -29,8 +30,8 @@ contract OurWallet {
         chairPerson = _chairPerson;
     }
     
-    function storeSanboxAddr(address _sanboxAddr) public {
-        sanboxAddr = _sanboxAddr;
+    function storeSanboxAddr(address _sandboxAddr) public {
+        sandboxAddr[_sandboxAddr] = true;
     }
 
     /**
@@ -45,7 +46,7 @@ contract OurWallet {
         return chairPerson;
     }
     
-    function retrieveSanboxAddr() public view returns (address){
-        return sanboxAddr;
+    function retrieveSanboxAddr(address _sandboxAddr) public view returns (bool){
+        return sandboxAddr[_sandboxAddr];
     }
 }
