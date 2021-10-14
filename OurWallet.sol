@@ -12,11 +12,13 @@ contract OurWallet {
     
     IERC20 public token;
 
-    uint256 number;
+    uint256 public number;
     address public chairPerson;
-    uint256 proposalCount;
+    uint256 public proposalCount;
     
     mapping(address => bool) public sandboxAddr;
+    
+    mapping(address => uint256) public tokenCollectionForVotes;
      
     constructor(address _token) {
         chairPerson = msg.sender; // 'msg.sender' is sender of current call, contract deployer for a constructor
@@ -57,7 +59,7 @@ contract OurWallet {
     function proposeSandboxAddrToggle(address _sandboxAddr) public {
         proposalArray.push(proposalAddr({
             proposedAddr: _sandboxAddr,
-            forToggle: 1,
+            forToggle: 0,
             againstToggle: 0
         }));
     }
@@ -68,6 +70,22 @@ contract OurWallet {
             sandboxAddr[proposalArray[_proposalIndx].proposedAddr] = !sandboxAddr[proposalArray[_proposalIndx].proposedAddr];
             proposalCount++;
         }
+    }
+    
+    function giveContractTokensForVotes(uint256 _tokenAmt) public {
+        require((token.balanceOf(msg.sender)) > _tokenAmt, "Not enough tokens");
+        safeTransferFrom(token, msg.sender, address(this), _tokenAmt);
+        tokenCollectionForVotes[msg.sender] = _tokenAmt;
+    }
+    
+    function safeTransferFrom(
+        IERC20 _token,
+        address _sender,
+        address _recipient,
+        uint _amount
+    ) private {
+        bool sent = _token.transferFrom(_sender, _recipient, _amount);
+        require(sent, "Token transfer failed");
     }
 
 
