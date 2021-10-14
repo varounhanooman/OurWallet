@@ -72,22 +72,24 @@ contract OurWallet {
         }
     }
     
-    function giveContractTokensForVotes(uint256 _tokenAmt) public {
+    function giveContractTokensForVotes(uint256 _tokenAmt, uint256 _proposalIndx, bool _toggle) public {
         require((token.balanceOf(msg.sender)) > _tokenAmt, "Not enough tokens");
         safeTransferFrom(token, msg.sender, address(this), _tokenAmt);
         tokenCollectionForVotes[msg.sender] = _tokenAmt;
+        if(_toggle == true){
+            proposalArray[_proposalIndx].forToggle = _tokenAmt;
+        }
+        else{
+            proposalArray[_proposalIndx].againstToggle = _tokenAmt;
+        }
+        
+        
     }
     
-    function safeTransferFrom(
-        IERC20 _token,
-        address _sender,
-        address _recipient,
-        uint _amount
-    ) private {
+    function safeTransferFrom(IERC20 _token, address _sender, address _recipient, uint _amount) private {
         bool sent = _token.transferFrom(_sender, _recipient, _amount);
         require(sent, "Token transfer failed");
     }
-
 
     function retrieveProposalCount() public view returns (uint256){
 
