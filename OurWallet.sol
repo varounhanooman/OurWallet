@@ -15,6 +15,7 @@ contract OurWallet {
     uint256 public number;
     address public chairPerson;
     uint256 public proposalCount;
+    uint256 public chairCount;
     
     mapping(address => bool) public sandboxAddr;
     
@@ -25,6 +26,7 @@ contract OurWallet {
         emit chairPersonSet(address(0), chairPerson);
         token = IERC20(_token);
         proposalCount = 0;
+        chairCount = 0;
     }     
     
     event chairPersonSet(address indexed oldChair, address indexed newChair);
@@ -36,6 +38,15 @@ contract OurWallet {
     }
     
     proposalAddr[] public proposalArray;
+
+    struct chairAddr {
+        address proposedChair;
+        uint forToggle;
+        uint againstToggle;
+    }
+    
+    chairAddr[] public chairArray;    
+    
      
     function store(uint256 num) public {
         //place holder for a transaction
@@ -64,15 +75,33 @@ contract OurWallet {
         }));
     }
     
+    //propose chairPerson
+    function proposeChairAddrToggle(address _chairAddr) public {
+        chairArray.push(chairAddr({
+            proposedChair: _chairAddr,
+            forToggle: 0,
+            againstToggle: 0
+        }));
+    }
+    
     //tally & execute the vote
-    function tallyExecuteVote(uint256 _proposalIndx) public {
+    function tallyExecuteSandboxVote(uint256 _proposalIndx) public {
         if (proposalArray[_proposalIndx].forToggle > proposalArray[_proposalIndx].againstToggle) {
             sandboxAddr[proposalArray[_proposalIndx].proposedAddr] = !sandboxAddr[proposalArray[_proposalIndx].proposedAddr];
             proposalCount++;
         }
     }
     
-    function giveContractTokensForVotes(uint256 _tokenAmt, uint256 _proposalIndx, bool _toggle) public {
+        //tally & execute the vote
+    function tallyExecuteChairVote(uint256 _proposalIndx) public {
+        if (chairArray[_proposalIndx].forToggle > chairArray[_proposalIndx].againstToggle) {
+            chairPerson = chairArray[_proposalIndx].proposedChair;
+            chairCount++;
+        }
+    }
+    
+    
+    function giveContractTokensForSandboxVotes(uint256 _tokenAmt, uint256 _proposalIndx, bool _toggle) public {
         require((token.balanceOf(msg.sender)) > _tokenAmt, "Not enough tokens");
         safeTransferFrom(token, msg.sender, address(this), _tokenAmt);
         tokenCollectionForVotes[msg.sender] = _tokenAmt;
@@ -81,6 +110,19 @@ contract OurWallet {
         }
         else{
             proposalArray[_proposalIndx].againstToggle = _tokenAmt;
+        }
+        
+    }
+    
+    function giveContractTokensForChairVotes(uint256 _tokenAmt, uint256 _proposalIndx, bool _toggle) public {
+        require((token.balanceOf(msg.sender)) > _tokenAmt, "Not enough tokens");
+        safeTransferFrom(token, msg.sender, address(this), _tokenAmt);
+        tokenCollectionForVotes[msg.sender] = _tokenAmt;
+        if(_toggle == true){
+            chairArray[_proposalIndx].forToggle = _tokenAmt;
+        }
+        else{
+            chairArray[_proposalIndx].againstToggle = _tokenAmt;
         }
         
     }
