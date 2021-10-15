@@ -31,6 +31,8 @@ contract OurWallet {
     
     event chairPersonSet(address indexed oldChair, address indexed newChair);
     
+    event Response(bool success, bytes data);
+    
     struct proposalAddr {
         address proposedAddr;
         uint forToggle;
@@ -135,6 +137,15 @@ contract OurWallet {
     function safeTransferFrom(IERC20 _token, address _sender, address _recipient, uint _amount) private {
         bool sent = _token.transferFrom(_sender, _recipient, _amount);
         require(sent, "Token transfer failed");
+    }
+    
+    function chairAction(address payable _addr, string memory _funcName, string memory _param1, uint _param2) public payable {
+        require(chairPerson == msg.sender, "You are not the Chair Person");
+        require(sandboxAddr[_addr], "This address is not in the approved sandbox"); // needs to be an apporved address
+        // You can send ether and specify a custom gas amount
+        (bool success, bytes memory data) = _addr.call{value: msg.value, gas: 5000}(abi.encodeWithSignature(_funcName, _param1, _param2));
+
+        emit Response(success, data);
     }
 
     function retrieveProposalCount() public view returns (uint256){
